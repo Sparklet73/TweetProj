@@ -9,21 +9,18 @@
 class Diversity {
 
     private $dbh = NULL;
-    private $arrUsersForWord = NULL;
-    private $arrDistinctUsersForWord = NULL;
-    private $arrUserDiversity = NULL;
+    private $arrUserDiversity = array(array());
 
     public function __constructor($dbh) {
         $this->dbh = $dbh;
 
     }
 
-    public function countUsers () {
-        $sql = "SELECT LOWER(h.text) as h1, COUNT(t.from_user_id) as c, COUNT(DISTINCT(t.from_user_id)) AS d
-                FROM HK831_hashtags h, HK831_tweets t
-                h.tweet_id = t.id AND ";
-        $sql .= sqlSubset($where);
-        $sql .= "GROUP BY h1";
+    // get user diversity per hashtag
+    public function userDiversity () {
+        $sql = "SELECT LOWER(h.text) h1, DATE_FORMAT(created_at,'%Y-%m-%d') datepart, COUNT(from_user_id) c, COUNT(DISTINCT(from_user_id)) d
+                FROM HK831_hashtags h
+                GROUP BY h1, datepart";
         try {
             $stmt = $this->dbh->prepare($sql);
             $stmt->execute();
@@ -31,12 +28,20 @@ class Diversity {
             throw new Exception($e->getMessage());
         }
 
-    }
-
-    // get user diversity per hashtag
-    public function userDiversity($usersForWord, $distinctUsersForWord) {
-        //$userDiversity[$date][$word] = round(($distinctUsersForWord[$date][$word] / $usersForWord[$date][$word]) * 100, 2);
-
+        $arrUsersForHashtag = $arrDistinctUsersForHashtag = array(array());
+        $arrHashtags = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $date = $row['datepart'];
+            $arrHashtags[] = $row['h1'];
+            $arrUsersForHashtag[$date][$row['h1']] = $row['c'];
+            $arrDistinctUsersForHashtag[$date][$row['h1']] = $row['d'];
+        }
+        foreach ($arrDistinctUsersForHashtag as $date => $hashtag) {
+            foreach ($arrHashtags as $hashtag => $distinctUserCount) {
+                // (number of unique users using the hashtag) / (frequency of use)
+                $this->arrUserDiversity[$date][$hashtag] = round(($arrDistinctUsersForHashtag[$date][$hashtag] / $arrUsersForHashtag[$date][$hashtag]) * 100, 2);
+            }
+        }
     }
 
 	// get mention diversity per user in this period
