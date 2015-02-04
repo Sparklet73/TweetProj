@@ -28,18 +28,21 @@ class Diversity {
             throw new Exception($e->getMessage());
         }
 
-        $arrUsersForHashtag = $arrDistinctUsersForHashtag = array(array());
-        $arrHashtags = array();
+        $arrUsersForHashtag = $arrDistinctUsersForHashtag = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $date = $row['datepart'];
-            $arrHashtags[] = $row['h1'];
-            $arrUsersForHashtag[$date][$row['h1']] = $row['c'];
-            $arrDistinctUsersForHashtag[$date][$row['h1']] = $row['d'];
+            $hashtag = $row['h1'];
+            if (!isset($arrUsersForHashtag[$date][$hashtag])) //先檢查這一天是否有這個hashtag
+                $arrUsersForHashtag[$date][$hashtag] = 0;
+            $arrUsersForHashtag[$date][$hashtag] += $row['c'];
+            if (!isset($arrDistinctUsersForHashtag[$date][$hashtag]))
+                $arrDistinctUsersForHashtag[$date][$hashtag] = 0;
+            $arrDistinctUsersForHashtag[$date][$hashtag] += $row['d'];
         }
-        foreach ($arrDistinctUsersForHashtag as $date => $hashtag) {
-            foreach ($arrHashtags as $hashtag => $distinctUserCount) {
+        foreach ($arrDistinctUsersForHashtag as $date => $hashtags) {
+            foreach ($hashtags as $hashtag => $distinctUserCount) {
                 // (number of unique users using the hashtag) / (frequency of use)
-                $this->arrUserDiversity[$date][$hashtag] = round(($arrDistinctUsersForHashtag[$date][$hashtag] / $arrUsersForHashtag[$date][$hashtag]) * 100, 2);
+                $this->arrUserDiversity[$date][$hashtag] = round(($arrDistinctUsersForHashtag[$date][$hashtag] / $arrUsersForHashtag[$date][$hashtag]), 2);
             }
         }
     }
