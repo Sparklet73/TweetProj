@@ -19,7 +19,7 @@ try {
     $diversity = new Diversity($dbh);
     $diversity->setDBPrefixName($strDBPrefix);
 
-} catch (Exception $ex) {
+} catch (PDOException $ex) {
     echo $ex->getMessage();
 }
 

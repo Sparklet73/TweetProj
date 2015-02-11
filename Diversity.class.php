@@ -15,7 +15,7 @@ class Diversity {
     private $arrUserDiversity = array();
     private $arrMentionDiversity = array();
 
-    public function __constructor($dbh) {
+    public function __construct($dbh) {
         $this->dbh = $dbh;
 
     }
@@ -39,12 +39,13 @@ class Diversity {
         $sql_init = "CREATE TABLE IF NOT EXISTS `" . $this->strUserDivName . "` (
             `UDId` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `hashtag` varchar(255) NOT NULL,
-            `date` datatime NOT NULL,
+            `date` datetime NOT NULL,
             `usrDiv` int(10) unsigned NOT NULL,
             `usrCount` int(10) unsigned NOT NULL,
             `uniqueUsrCount` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`UDId`),
+            PRIMARY KEY (`UDId`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
+        echo $sql_init;
         try {
             $stmt = $this->dbh->prepare($sql_init);
             $stmt->execute();
@@ -57,12 +58,12 @@ class Diversity {
     public function initTableMentionDiv() {
         $sql_init = "CREATE TABLE IF NOT EXISTS `" . $this->strMentionDivName . "` (
             `MDId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `from_usr_id` bigint(20) unsigned NOT NULL,
+            `` bigint(20) unsigned NOT NULL,
             `from_usr_name` varchar(255) NOT NULL,
             `mentionDiv` int(10) unsigned NOT NULL,
             `rtUsrCount` int(10) unsigned NOT NULL,
             `uniqueRtUsrCount` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`MDId`),
+            PRIMARY KEY (`MDId`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
         try {
             $stmt = $this->dbh->prepare($sql_init);
