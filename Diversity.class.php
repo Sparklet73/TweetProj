@@ -28,6 +28,10 @@ class Diversity {
         $this->strBinName = $strDBPrefix;
         $this->strUserDivName = $strDBPrefix . '_UserDiv';
         $this->strMentionDivName = $strDBPrefix . '_MentionDiv';
+        $this->initTableUserDiv();
+        $this->userDiversity();
+        $this->initTableMentionDiv();
+        $this->mentionDiversity();
     }
 
     //initial table for storing UserDiversity
@@ -94,23 +98,20 @@ class Diversity {
             $arrDistinctUsersForHashtag[$date][$hashtag] = $row['d'];
         }
         $sql_write = "REPLACE INTO `" . $this->strUserDivName . "`
-                        VALUES(NULL,:hashtag,:date,:usrDiv,:usrCount,:uniqueUserCount);";
+                        VALUES(NULL,:hashtag,:date,:userDiv,:userCount,:uniqueUserCount);";
 
         foreach ($arrDistinctUsersForHashtag as $date => $hashtags) {
             foreach ($hashtags as $hashtag => $distinctUserCount) {
                 // (number of unique users using the hashtag) / (frequency of use)
                 $this->arrUserDiversity[$date][$hashtag] = round(($arrDistinctUsersForHashtag[$date][$hashtag] / $arrUsersForHashtag[$date][$hashtag]), 2);
 
-
                 $sql_write->bindParam(':hashtag', $hashtag, PDO::PARAM_STR);
                 $sql_write->bindParam(':date', $date, PDO::PARAM_STR);
-                $sql_write->bindParam(':usrDiv', $this->arrUserDiversity[$date][$hashtag], PDO::Param_)
+                $sql_write->bindParam(':userDiv', $this->arrUserDiversity[$date][$hashtag], PDO::PARAM_STR);
+                $sql_write->bindParam(':userCount', $arrUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
+                $sql_write->bindParam(':uniqueUserCount', $arrDistinctUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
             }
         }
-
-
-
-
     }
 
 	// get rt/mention diversity per user
@@ -131,9 +132,19 @@ class Diversity {
             $arrRtUsersCount[$date][$usr] = $row['c'];
             $arrDistinctRtUsersCount[$date][$usr] = $row['d'];
         }
+
+        $sql_write = "REPLACE INTO `" . $this->strMentionDivName . "`
+                        VALUES(NULL,:User,:date,:mentionDiv,:RtUserCount,:uniqueRtUserCount);";
+
         foreach ($arrDistinctRtUsersCount as $date => $usrs) {
             foreach ($usrs as $usr => $distinctUserCount) {
-                $this->arrMentionDiversity[$date][$usr] = round(($arrDistinctRtUsersCount[$date[$usr]] / $arrRtUsersCount[$date][$usr]), 2);
+                $this->arrMentionDiversity[$date][$usr] = round(($arrDistinctRtUsersCount[$date][$usr] / $arrRtUsersCount[$date][$usr]), 2);
+
+                $sql_write->bindParam(':User', $usr, PDO::PARAM_STR);
+                $sql_write->bindParam(':date', $date, PDO::PARAM_STR);
+                $sql_write->bindParam(':mentionDiv', $this->arrMentionDiversity[$date][$usr], PDO::PARAM_STR);
+                $sql_write->bindParam(':RtUserCount', $arrRtUsersCount[$date][$usr], PDO::PARAM_STR);
+                $sql_write->bindParam(':uniqueRtUserCount', $arrDistinctRtUsersCount[$date][$usr], PDO::PARAM_STR);
             }
         }
 
