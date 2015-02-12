@@ -17,7 +17,6 @@ class Diversity {
 
     public function __construct($dbh) {
         $this->dbh = $dbh;
-
     }
 
     // set database prefix word
@@ -30,8 +29,8 @@ class Diversity {
         $this->strMentionDivName = $strDBPrefix . '_MentionDiv';
         $this->initTableUserDiv();
         $this->userDiversity();
-        $this->initTableMentionDiv();
-        $this->mentionDiversity();
+        //$this->initTableMentionDiv();
+        //$this->mentionDiversity();
     }
 
     //initial table for storing UserDiversity
@@ -40,12 +39,11 @@ class Diversity {
             `UDId` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `hashtag` varchar(255) NOT NULL,
             `date` datetime NOT NULL,
-            `usrDiv` int(10) unsigned NOT NULL,
-            `usrCount` int(10) unsigned NOT NULL,
-            `uniqueUsrCount` int(10) unsigned NOT NULL,
+            `userDiv` float unsigned NOT NULL,
+            `userCount` int(10) unsigned NOT NULL,
+            `uniqueUserCount` int(10) unsigned NOT NULL,
             PRIMARY KEY (`UDId`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
-        echo $sql_init;
         try {
             $stmt = $this->dbh->prepare($sql_init);
             $stmt->execute();
@@ -58,9 +56,10 @@ class Diversity {
     public function initTableMentionDiv() {
         $sql_init = "CREATE TABLE IF NOT EXISTS `" . $this->strMentionDivName . "` (
             `MDId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `` bigint(20) unsigned NOT NULL,
-            `from_usr_name` varchar(255) NOT NULL,
-            `mentionDiv` int(10) unsigned NOT NULL,
+            `starUsrId` bigint(20) unsigned NOT NULL,
+            `starUsrName` varchar(255) NOT NULL,
+            `date` datetime NOT NULL,
+            `mentionDiv` float unsigned NOT NULL,
             `rtUsrCount` int(10) unsigned NOT NULL,
             `uniqueRtUsrCount` int(10) unsigned NOT NULL,
             PRIMARY KEY (`MDId`)
@@ -100,17 +99,23 @@ class Diversity {
         }
         $sql_write = "REPLACE INTO `" . $this->strUserDivName . "`
                         VALUES(NULL,:hashtag,:date,:userDiv,:userCount,:uniqueUserCount);";
+        try {
+            $stmt = $this->dbh->prepare($sql_write);
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
+        }
 
         foreach ($arrDistinctUsersForHashtag as $date => $hashtags) {
             foreach ($hashtags as $hashtag => $distinctUserCount) {
                 // (number of unique users using the hashtag) / (frequency of use)
                 $this->arrUserDiversity[$date][$hashtag] = round(($arrDistinctUsersForHashtag[$date][$hashtag] / $arrUsersForHashtag[$date][$hashtag]), 2);
 
-                $sql_write->bindParam(':hashtag', $hashtag, PDO::PARAM_STR);
-                $sql_write->bindParam(':date', $date, PDO::PARAM_STR);
-                $sql_write->bindParam(':userDiv', $this->arrUserDiversity[$date][$hashtag], PDO::PARAM_STR);
-                $sql_write->bindParam(':userCount', $arrUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
-                $sql_write->bindParam(':uniqueUserCount', $arrDistinctUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
+                $stmt->bindParam(':hashtag', $hashtag, PDO::PARAM_STR);
+                $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+                $stmt->bindParam(':userDiv', $this->arrUserDiversity[$date][$hashtag], PDO::PARAM_STR);
+                $stmt->bindParam(':userCount', $arrUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
+                $stmt->bindParam(':uniqueUserCount', $arrDistinctUsersForHashtag[$date][$hashtag], PDO::PARAM_STR);
+                $stmt->execute();
             }
         }
     }
@@ -136,16 +141,22 @@ class Diversity {
 
         $sql_write = "REPLACE INTO `" . $this->strMentionDivName . "`
                         VALUES(NULL,:User,:date,:mentionDiv,:RtUserCount,:uniqueRtUserCount);";
+        try {
+            $stmt = $this->dbh->prepare($sql_write);
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
+        }
 
         foreach ($arrDistinctRtUsersCount as $date => $usrs) {
             foreach ($usrs as $usr => $distinctUserCount) {
                 $this->arrMentionDiversity[$date][$usr] = round(($arrDistinctRtUsersCount[$date][$usr] / $arrRtUsersCount[$date][$usr]), 2);
 
-                $sql_write->bindParam(':User', $usr, PDO::PARAM_STR);
-                $sql_write->bindParam(':date', $date, PDO::PARAM_STR);
-                $sql_write->bindParam(':mentionDiv', $this->arrMentionDiversity[$date][$usr], PDO::PARAM_STR);
-                $sql_write->bindParam(':RtUserCount', $arrRtUsersCount[$date][$usr], PDO::PARAM_STR);
-                $sql_write->bindParam(':uniqueRtUserCount', $arrDistinctRtUsersCount[$date][$usr], PDO::PARAM_STR);
+                $stmt->bindParam(':User', $usr, PDO::PARAM_STR);
+                $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+                $stmt->bindParam(':mentionDiv', $this->arrMentionDiversity[$date][$usr], PDO::PARAM_STR);
+                $stmt->bindParam(':RtUserCount', $arrRtUsersCount[$date][$usr], PDO::PARAM_STR);
+                $stmt->bindParam(':uniqueRtUserCount', $arrDistinctRtUsersCount[$date][$usr], PDO::PARAM_STR);
+                $stmt->execute();
             }
         }
 
