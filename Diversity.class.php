@@ -15,8 +15,14 @@ class Diversity {
     private $arrUserDiversity = array();
     private $arrMentionDiversity = array();
 
-    public function __construct($dbh) {
+    public function __construct($dbh, $strDBPrefix) {
         $this->dbh = $dbh;
+
+        $this->setDBPrefixName($strDBPrefix);
+        $this->initTableUserDiv();
+        $this->userDiversity();
+        //$this->initTableMentionDiv();
+        //$this->mentionDiversity();
     }
 
     // set database prefix word
@@ -27,10 +33,6 @@ class Diversity {
         $this->strBinName = $strDBPrefix;
         $this->strUserDivName = $strDBPrefix . '_UserDiv';
         $this->strMentionDivName = $strDBPrefix . '_MentionDiv';
-        $this->initTableUserDiv();
-        $this->userDiversity();
-        //$this->initTableMentionDiv();
-        //$this->mentionDiversity();
     }
 
     //initial table for storing UserDiversity

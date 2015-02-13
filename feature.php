@@ -7,6 +7,7 @@
  */
 require_once 'config.php';
 require_once 'Diversity.class.php';
+require_once 'User.class.php';
 
 
 
@@ -16,8 +17,8 @@ try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $dbuser, $dbpass);
     $dbh ->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-    $diversity = new Diversity($dbh);
-    $diversity->setDBPrefixName($strDBPrefix);
+    //$diversity = new Diversity($dbh, $strDBPrefix);
+    $user = new User($dbh, $strDBPrefix);
 
 } catch (PDOException $ex) {
     echo $ex->getMessage();
