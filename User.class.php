@@ -50,7 +50,12 @@ class User {
             `user_description` varchar(255),
             `user_lang` varchar(16),
             `user_location` varchar(64),
-            PRIMARY KEY (`user_Id`)
+            PRIMARY KEY (`user_Id`),
+            KEY (`user_tweetCount`),
+            KEY (`user_followerCount`),
+            KEY (`user_friendCount`),
+            KEY (`user_listedCount`),
+            FULLTEXT KEY (`user_description`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
         try {
             $stmt = $this->dbh->prepare($sql_init);
@@ -62,7 +67,7 @@ class User {
 
     public function saveUserData() {
         $sql = "INSERT INTO ". $this->strUserTable.  "  (`user_Id`,`user_name`,`user_tweetCount`,`user_followerCount`,`user_friendCount`,`user_listedCount`,`user_description`,`user_lang`,`user_location`)
-                SELECT `from_user_id`,`from_user_name`, max(`from_user_tweetcount`),max(`from_user_followercount`),max(`from_user_friendcount`),max(`from_user_listed`),`from_user_description`,`from_user_lang`,`location`
+                SELECT `from_user_id`,`from_user_name`, max(`from_user_tweetcount`), max(`from_user_followercount`), max(`from_user_friendcount`), max(`from_user_listed`), `from_user_description`, `from_user_lang`, `location`
                 FROM `" . $this->strBinName . "_tweets`
                 GROUP BY `from_user_id`;";
         try {

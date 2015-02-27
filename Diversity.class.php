@@ -44,7 +44,9 @@ class Diversity {
             `userDiv` float unsigned NOT NULL,
             `userCount` int(10) unsigned NOT NULL,
             `uniqueUserCount` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`UDId`)
+            PRIMARY KEY (`UDId`),
+            KEY (`hashtag`),
+            KEY (`date`),
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
         try {
             $stmt = $this->dbh->prepare($sql_init);
@@ -64,7 +66,9 @@ class Diversity {
             `mentionDiv` float unsigned NOT NULL,
             `rtUsrCount` int(10) unsigned NOT NULL,
             `uniqueRtUsrCount` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`MDId`)
+            PRIMARY KEY (`MDId`),
+            KEY (`starUsrId`),
+            KEY (`date`),
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
         try {
             $stmt = $this->dbh->prepare($sql_init);
