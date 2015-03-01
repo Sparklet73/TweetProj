@@ -50,11 +50,13 @@ class User {
             `user_description` varchar(255),
             `user_lang` varchar(16),
             `user_location` varchar(64),
+			`user_maxRTcount` int(10) unsigned NOT NULL,
             PRIMARY KEY (`user_Id`),
             KEY (`user_tweetCount`),
             KEY (`user_followerCount`),
             KEY (`user_friendCount`),
             KEY (`user_listedCount`),
+			KEY (`user_maxRTcount`),
             FULLTEXT KEY (`user_description`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
         try {
@@ -67,7 +69,7 @@ class User {
 
     public function saveUserData() {
         $sql = "INSERT INTO ". $this->strUserTable.  "  (`user_Id`,`user_name`,`user_tweetCount`,`user_followerCount`,`user_friendCount`,`user_listedCount`,`user_description`,`user_lang`,`user_location`)
-                SELECT `from_user_id`,`from_user_name`, max(`from_user_tweetcount`), max(`from_user_followercount`), max(`from_user_friendcount`), max(`from_user_listed`), `from_user_description`, `from_user_lang`, `location`
+                SELECT `from_user_id`,`from_user_name`, max(`from_user_tweetcount`), max(`from_user_followercount`), max(`from_user_friendcount`), max(`from_user_listed`), `from_user_description`, `from_user_lang`, `location`, max(`retweet_count`)
                 FROM `" . $this->strBinName . "_tweets`
                 GROUP BY `from_user_id`;";
         try {
@@ -77,4 +79,8 @@ class User {
             throw new Exception($e->getMessage());
         }
     }
+	
+	public function UserRTCountperday() {
+		
+	}
 }
