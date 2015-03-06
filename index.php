@@ -17,6 +17,7 @@
 
   <script src="http://visjs.org/dist/vis.js"></script>
   <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 </head>
 <body>
 <div id="visualization"></div>
@@ -24,6 +25,24 @@
 <script type="text/javascript">
   // DOM element where the Timeline will be attached
   var container = document.getElementById('visualization');
+
+  var showTimeline = function (user, content, startday) {
+      $.ajaxSetup({
+        cache: false
+      });
+
+      var jqxhr = $.getJSON('ajax_test.php'. {
+          usr: user,
+          ct: content,
+          st: startday
+      });
+
+      jqxhr.done(function (data) {
+          if(data.rsStatus) {
+
+          }
+      })
+  }
 
   // Create a DataSet (allows two way data-binding)
   var items = new vis.DataSet([
