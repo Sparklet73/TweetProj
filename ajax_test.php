@@ -6,7 +6,7 @@
  * Time: 上午 10:30
  */
 require_once 'config.php';
-require_once 'User.class.php';
+require_once 'class/User.class.php';
 
 $strDBPrefix = 'HK928';
 

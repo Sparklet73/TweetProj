@@ -6,8 +6,8 @@
  * Time: 下午 5:20
  */
 require_once 'config.php';
-require_once 'Diversity.class.php';
-require_once 'User.class.php';
+require_once 'class/Diversity.class.php';
+require_once 'class/User.class.php';
 
 $strDBPrefix = 'HK928';
 
