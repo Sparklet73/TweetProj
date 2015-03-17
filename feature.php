@@ -9,14 +9,15 @@ require_once 'config.php';
 require_once 'class/Diversity.class.php';
 require_once 'class/User.class.php';
 
-$strDBPrefix = 'HK928';
+$strDBPrefix = 'HK831';
 
 try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $dbuser, $dbpass);
     $dbh ->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
     //$diversity = new Diversity($dbh, $strDBPrefix);
-    //$user = new User($dbh, $strDBPrefix);
+    $user = new User($dbh, $strDBPrefix);
+    $user->UserRankLevel();
 
 } catch (PDOException $ex) {
     echo $ex->getMessage();
