@@ -8,6 +8,7 @@
 
 require_once '../config.php';
 
+//找出每天每時的最終超過10個RT的推文
 try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $dbuser, $dbpass);
     $dbh ->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
@@ -15,9 +16,11 @@ try {
     echo $ex->getMessage();
 }
 
-$sql = "SELECT  `from_user_name`,`from_user_description`,`from_user_followercount` follower,`from_user_listed` listed,`text`,`retweet_id`,max(`retweet_count`)
+$sql = "SELECT DATE_FORMAT(created_at,'%Y-%m-%d %H') as date,`text`,`retweet_id`, `retweet_count`
         FROM `HK928_tweets`
-        GROUP BY DATE_FORMAT(created_at,'%Y-%m-%d')";
+        WHERE `lang` = 'zh' AND `retweet_count` >9
+        GROUP BY `text`,date
+        ORDER BY date ASC;";
 
 try {
     $stmt = $this->dbh->prepare($sql);
