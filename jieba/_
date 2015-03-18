@@ -1,0 +1,11 @@
+#encoding=utf-8
+import jieba
+
+jieba.set_dictionary('jieba-0.35/jieba/dict.txt.big')
+content = open('lyrics.txt', 'rb').read()
+
+words = jieba.cut(content, cut_all=False)
+print content
+print
+for word in words:
+    print word + " / ",
