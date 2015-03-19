@@ -29,11 +29,11 @@ try {
     throw new Exception($e->getMessage());
 }
 
-$tweetscsv = fopen('rtover10tweets.csv', 'w');
+$tweetscsv = fopen('HK928_RT10count.csv', 'w');
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 foreach($result as $val) {
     #fwrite($tweetscsv,$val['text']);
-    fputcsv($f1, $val);
+    fputcsv($tweetscsv, $val);
 }
 
 fclose($tweetscsv);
