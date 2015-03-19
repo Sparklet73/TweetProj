@@ -29,13 +29,22 @@ try {
     throw new Exception($e->getMessage());
 }
 
-$arrUserTweets = array();
+$tweetscsv = fopen('rtover10tweets.csv', 'w');
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+foreach($result as $val) {
+    #fwrite($tweetscsv,$val['text']);
+    fputcsv($f1, $val);
+}
+
+fclose($tweetscsv);
+
+/*$arrUserTweets = array();
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $user = $row['username'];
     $hashtag = $row['h1'];
     $arrUsersForHashtag[$date][$hashtag] = $row['c'];
     $arrDistinctUsersForHashtag[$date][$hashtag] = $row['d'];
-}
+}*/
 
 
 $dbh = NULL;
