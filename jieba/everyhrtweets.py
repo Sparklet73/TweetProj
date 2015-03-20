@@ -4,6 +4,7 @@ import csv
 import jieba
 import jieba.analyse
 import jieba.posseg as pseg
+#import numpy
 
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
@@ -38,14 +39,15 @@ def func_tags(data):
     f.close()
 
 def func_syntac(data):
-    dsyntac = {} #{"date",mix{}}
+    fin = open("syntac_RT10count.csv", 'wb')
+    #dsyntac = numpy.zeros((3000,4))
+    #dsyntac = [][]
+    #dsyntac = [[foo for i in range(10)] for j in range(10)]
     nr = []
     ns = []
     nt = []
-    mix = {"nr":nr,"ns":ns,"nt":nt}
-    #mix[nr] = list()
-    #mix[ns] = list()
-    #mix[nt] = list()
+    #arr = [nr,ns,nt]
+    dstr = ""
     #nr人名 #ns地名 #nt機構團體名
     with open(data, 'r') as f:
         reader = csv.reader(f)
@@ -55,32 +57,53 @@ def func_syntac(data):
             if(date != row[0]):
                 words = pseg.cut(content)
                 for w in words:
-                    if(w.flag == "nr" and w.word not in mix["nr"]):
-                        mix["nr"].append(w.word)
-                    if(w.flag == "ns" and w.word not in mix["ns"]):
-                        mix["ns"].append(w.word)
-                    if(w.flag == "nt" and w.word not in mix["nt"]):
-                        mix["nt"].append(w.word)
-                dsyntac.update({row[0]:mix})
-                data = row[0]
+                    if(w.flag == "nr" and w.word not in nr):
+                        nr.append(w.word)
+                    if(w.flag == "ns" and w.word not in ns):
+                        ns.append(w.word)
+                    if(w.flag == "nt" and w.word not in nt):
+                        nt.append(w.word)
+                #dsyntac[i][0]=date
+                #dsyntac[i][1]=nr
+                #dsyntac[i][2]=ns
+                #dsyntac[i][3]=nt
+                dstr = date +","
+                for r in nr:
+                    dstr += r + "/"
+                dstr += ","
+                for s in ns:
+                    dstr += s +"/"
+                dstr += ","
+                for t in nt:
+                    dstr += t +"/"
+                dstr += ","
+                dstr += "\n"
+                fin.write(dstr.encode('utf8'))
+                date = row[0]
                 content = ""
+                nr = []
+                ns = []
+                nt = []
             content += row[1]
 
-    dstr = ""
-    for k, v in dsyntac.items():
-        dstr += k + ","
-        for v, j in mix.items():
-            dstr += v + ":"
-            for i in j:
-                dstr += i + "/"
-        dstr += "\n"
 
-    fin = open("syntac_RT10count.csv", 'wb')
-    fin.write("date,nr,ns,nt\n")
-    fin.write(dstr.encode('utf8'))
+    ###for value in dsyntac:
+	###	dst += value + ","
+	#	for subvalue in value:
+#			dstr += subvalue + "/"
+#		dstr += "\n"
+
+ #   for k, v in dsyntac.items():
+  #      dstr += k + ","
+   #     for v, j in mix.items():
+    #        dstr += v + ":"
+     #       for i in j:
+      #          dstr += i + "/"
+       # dstr += "\n"'''
+
+    #fin.write(dstr.encode('utf8'))
     f.close()
     fin.close()
-
 
 if __name__ == "__main__":
     data = "rawdata/HK928_RT10count.csv"
