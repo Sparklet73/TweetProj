@@ -4,7 +4,7 @@ import csv
 import jieba
 import jieba.analyse
 import jieba.posseg as pseg
-#import numpy
+import operator
 
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
@@ -40,13 +40,9 @@ def func_tags(data):
 
 def func_syntac(data):
     fin = open("syntac_RT10count.csv", 'wb')
-    #dsyntac = numpy.zeros((3000,4))
-    #dsyntac = [][]
-    #dsyntac = [[foo for i in range(10)] for j in range(10)]
-    nr = []
-    ns = []
-    nt = []
-    #arr = [nr,ns,nt]
+    nr = {}
+    ns = {}
+    nt = {}
     dstr = ""
     #nr人名 #ns地名 #nt機構團體名
     with open(data, 'r') as f:
@@ -57,24 +53,32 @@ def func_syntac(data):
             if(date != row[0]):
                 words = pseg.cut(content)
                 for w in words:
-                    if(w.flag == "nr" and w.word not in nr):
-                        nr.append(w.word)
-                    if(w.flag == "ns" and w.word not in ns):
-                        ns.append(w.word)
-                    if(w.flag == "nt" and w.word not in nt):
-                        nt.append(w.word)
-                #dsyntac[i][0]=date
-                #dsyntac[i][1]=nr
-                #dsyntac[i][2]=ns
-                #dsyntac[i][3]=nt
+                    if(w.flag == "nr"):
+						if(w.word not in nr):
+							nr[w.word] = 1
+						else:
+							nr[word] += 1
+                    if(w.flag == "ns"):
+						if(w.word not in ns):
+							ns[w.word] = 1
+						else:
+							ns[w.word] += 1
+                    if(w.flag == "nt"):
+						if(w.word not in nt):
+							nt[w.word] = 1
+						else:
+							nt[w.word] += 1
+				sorted_nr = sorted(nr.items(), key=operator.itemgetter(1), reverse=True)
+				sorted_ns = sorted(ns.items(), key=operator.itemgetter(1), reverse=True)
+				sorted_nt = sorted(nt.items(), key=operator.itemgetter(1), reverse=True)
                 dstr = date +","
-                for r in nr:
+                for r in sorted_nr:
                     dstr += r + "/"
                 dstr += ","
-                for s in ns:
+                for s in sorted_ns:
                     dstr += s +"/"
                 dstr += ","
-                for t in nt:
+                for t in sorted_nt:
                     dstr += t +"/"
                 dstr += ","
                 dstr += "\n"
@@ -85,21 +89,6 @@ def func_syntac(data):
                 ns = []
                 nt = []
             content += row[1]
-
-
-    ###for value in dsyntac:
-	###	dst += value + ","
-	#	for subvalue in value:
-#			dstr += subvalue + "/"
-#		dstr += "\n"
-
- #   for k, v in dsyntac.items():
-  #      dstr += k + ","
-   #     for v, j in mix.items():
-    #        dstr += v + ":"
-     #       for i in j:
-      #          dstr += i + "/"
-       # dstr += "\n"'''
 
     #fin.write(dstr.encode('utf8'))
     f.close()
