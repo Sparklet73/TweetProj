@@ -5,6 +5,7 @@ import jieba
 import jieba.analyse
 import jieba.posseg as pseg
 import operator
+from collections import defaultdict
 
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
@@ -40,11 +41,12 @@ def func_tags(data):
 
 def func_syntac(data):
     fin = open("syntac_RT10count.csv", 'wb')
-    nr = {}
-    ns = {}
-    nt = {}
+    lst=["nr","ns","nt","v","a","r","z"]
+    fin.write("date,nr,ns,nt,v,a,r,z")
+    dSyn = defaultdict(dict)
+    for grammar in lst:
+        dSyn[grammar]
     dstr = ""
-    #nr人名 #ns地名 #nt機構團體名
     with open(data, 'r') as f:
         reader = csv.reader(f)
         date = ""
@@ -53,44 +55,26 @@ def func_syntac(data):
             if(date != row[0]):
                 words = pseg.cut(content)
                 for w in words:
-                    if(w.flag == "nr"):
-						if(w.word not in nr):
-							nr[w.word] = 1
-						else:
-							nr[word] += 1
-                    if(w.flag == "ns"):
-						if(w.word not in ns):
-							ns[w.word] = 1
-						else:
-							ns[w.word] += 1
-                    if(w.flag == "nt"):
-						if(w.word not in nt):
-							nt[w.word] = 1
-						else:
-							nt[w.word] += 1
-				sorted_nr = sorted(nr.items(), key=operator.itemgetter(1), reverse=True)
-				sorted_ns = sorted(ns.items(), key=operator.itemgetter(1), reverse=True)
-				sorted_nt = sorted(nt.items(), key=operator.itemgetter(1), reverse=True)
-                dstr = date +","
-                for r in sorted_nr:
-                    dstr += r + "/"
-                dstr += ","
-                for s in sorted_ns:
-                    dstr += s +"/"
-                dstr += ","
-                for t in sorted_nt:
-                    dstr += t +"/"
-                dstr += ","
+                    if(w.flag in dSyn):
+                        if(w.word not in dSyn[w.flag]):
+                            dSyn[w.flag][w.word] = 0
+                        else:
+                            dSyn[w.flag].update({w.word:dSyn[w.flag][w.word]+1})
+                dstr = date + ","
+                for elem in lst:
+                    sorted_elem = sorted(dSyn[elem].items(), key=operator.itemgetter(1), reverse=True)
+                    for kw in sorted_elem:
+                        dstr += kw[0] + "/"
+                    dstr += ","
                 dstr += "\n"
                 fin.write(dstr.encode('utf8'))
                 date = row[0]
                 content = ""
-                nr = []
-                ns = []
-                nt = []
+                dSyn = defaultdict(dict)
+                for grammar in lst:
+                    dSyn[grammar]
             content += row[1]
 
-    #fin.write(dstr.encode('utf8'))
     f.close()
     fin.close()
 
