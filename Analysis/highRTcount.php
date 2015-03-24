@@ -17,9 +17,9 @@ try {
 }
 
 $sql = "SELECT DATE_FORMAT(created_at,'%Y-%m-%d %H') as date,`text`,`retweet_id`, `retweet_count`
-        FROM `HK928_tweets`
-        WHERE `lang` = 'zh' AND `retweet_count` >9
-        GROUP BY `text`,date
+        FROM `HKALL_tweets_zh`
+        WHERE `retweet_count` >9
+        GROUP BY `id`,date
         ORDER BY date ASC;";
 
 try {
@@ -29,7 +29,7 @@ try {
     throw new Exception($e->getMessage());
 }
 
-$tweetscsv = fopen('HK928_RT10count.csv', 'w');
+$tweetscsv = fopen('HKALL_tweets_RT10count.csv', 'w');
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 foreach($result as $val) {
     #fwrite($tweetscsv,$val['text']);

@@ -10,9 +10,9 @@ from collections import defaultdict
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
 jieba.analyse.set_stop_words("dict/utf8stopwords_addtrad.txt")
-stopwords = ["http","co","RT","hkclassboycott","HongKong","OccupyCentral"]
+stopwords = ["http","co","RT"]
 
-def func_tags(data):
+def func_tags(data,bins):
     dateTXT = {}
     with open(data, 'r') as f:
         reader = csv.reader(f)
@@ -34,15 +34,15 @@ def func_tags(data):
     for k, v in dateTXT.items():
         dstr += k + "," + v + "\n"
 
-    fns = open("tags_RT10count.csv", 'wb')
+    fns = open(bins+"tags_RT10count.csv", 'wb')
     fns.write(dstr.encode('utf8'))
     fns.close()
     f.close()
 
-def func_syntac(data):
-    fin = open("syntac_RT10count.csv", 'wb')
-    lst=["nr","ns","nt","v","a","r","z"]
-    fin.write("date,nr,ns,nt,v,a,r,z")
+def func_syntac(data,bins):
+    fin = open(bins+"syntac_RT10count.csv", 'wb')
+    lst=["nr","ns","nt","a","eng"]
+    fin.write("date,nr,ns,nt,a,eng")
     dSyn = defaultdict(dict)
     for grammar in lst:
         dSyn[grammar]
@@ -55,6 +55,8 @@ def func_syntac(data):
             if(date != row[0]):
                 words = pseg.cut(content)
                 for w in words:
+                    if w.word in stopwords:
+                        continue
                     if(w.flag in dSyn):
                         if(w.word not in dSyn[w.flag]):
                             dSyn[w.flag][w.word] = 0
@@ -78,7 +80,42 @@ def func_syntac(data):
     f.close()
     fin.close()
 
+def keyword_change():
+    fres = open("HKALL_keywordChange.csv",'wb')
+    fres.write("date,nr,ns,nt,a,eng")
+    lst = ["nr","ns","nt","a","eng"]
+    dlst = {"nr":1,"ns":2,"nt":3,"a":4,"eng":5}
+    dkw = defaultdict() #過濾出的關鍵字
+    for grammar in lst:
+        dkw[grammar] = []
+    dstr = ""
+    with open("HKALL_syntac_RT10count.csv", 'r') as f:
+        reader = csv.reader(f)
+        datehr = "date"
+        for rowx in reader:
+            row = [x.decode('utf8') for x in rowx]
+            tempkw = defaultdict()
+            for dif in lst:
+                tempkw[dif] = row[dlst[dif]].split('/')
+                sdkw = set(dkw[dif])
+                stmp = set(tempkw[dif])
+                dkw[dif] = list(stmp.difference(sdkw))
+            datehr = row[0]
+            dstr = datehr + ","
+            for elem in lst:
+                for w in dkw[elem]:
+                    dstr += w + "/"
+                dstr += ","
+            dstr += "\n"
+            fres.write(dstr.encode('utf8'))
+
+    f.close()
+    fres.close()
+
+
 if __name__ == "__main__":
-    data = "rawdata/HK928_RT10count.csv"
-    #func_tags(data)
-    func_syntac(data)
+    data = "rawdata/HKALL_tweets_RT10count.csv"
+    bins = "HKALL_"
+    #func_tags(data,bins)
+    #func_syntac(data,bins)
+    keyword_change()
