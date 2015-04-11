@@ -1,16 +1,24 @@
 #encoding=utf-8
-import csv
-#import codecs
+import csv,sys
 import jieba
 import jieba.analyse
 import jieba.posseg as pseg
 import operator
 from collections import defaultdict
+from _gexf import Gexf
+import time
+import chardet
+import codecs
 
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
 jieba.analyse.set_stop_words("dict/utf8stopwords_addtrad.txt")
 stopwords = ["http","co","RT"]
+
+default_encoding = 'utf-8'
+if sys.getdefaultencoding() != default_encoding:
+    reload(sys)
+    sys.setdefaultencoding(default_encoding)
 
 def func_tags(data,bins):
     dateTXT = {}
@@ -112,10 +120,135 @@ def keyword_change():
     f.close()
     fres.close()
 
+#etree can't take good work in chinese.
+def makeGexf():
+    raw_file_name = "gexf_format_test.csv"
+    #raw_file_name = "HKALL_tags_RT10count.csv"
+    gexf = Gexf("Ching-Ya Lin", "Keyword relation by hours.")
+    graph = gexf.addGraph("undirected","dynamic","graph!","datetime")
+    wid = graph.addNodeAttribute("Weight","1","integer","dynamic")
+    ewid = graph.addEdgeAttribute("EdgeWeight","1","integer","dynamic")
+
+    if(1):
+        f = codecs.open( raw_file_name, "r", "utf-8" )
+    #with open(raw_file_name, 'r') as f:
+        reader = csv.reader(f)
+        w_d = defaultdict() #weight_dictionary for all keywords
+        e_w_d = defaultdict() #edge
+        for row in reader:
+            #row = [x.decode('utf8') for x in rowx]
+            tt = time.strptime(row[0], "%Y-%m-%d %H")
+            rtt = time.strftime("%Y-%m-%d %H:00:00", tt)
+            words = row[1].split('/')
+            templist = [] #one row list to help addEdge
+            for w in words:
+                # useless : w = w.encode('utf8')
+                #print w
+                #print chardet.detect(w)
+                templist.append(w)
+                if graph.nodeExists(w):
+                    n = graph.nodes[w]
+                    v = w_d[w] + 1
+                    #v = int(n.attributes[int(wid)]["value"])
+                    #n.attributes will get the initial value which we don't want.
+                    n.addAttribute(wid,str(v),rtt)
+                    w_d[w] = v
+                else:
+                    new = graph.addNode(w,w,rtt)
+                    new.addAttribute(wid,"1",rtt)
+                    w_d[w] = 1
+
+            for w1 in templist:
+                for w2 in templist:
+                    if w1 != w2:
+                        s1 = w1 + w2
+                        s2 = w2 + w1
+                        if graph.edgeExists(s1):
+                            e = graph.edges[s1]
+                            val = e_w_d[s1] + 1
+                            e.addAttribute(ewid,str(val),rtt)
+                            e_w_d[s1] = val
+                        elif graph.edgeExists(s2):
+                            e = graph.edges[s2]
+                            val = e_w_d[s2] + 1
+                            e.addAttribute(ewid,str(val),rtt)
+                            e_w_d[s2] = val
+                        else:
+                            enew = graph.addEdge(s1,w1,w2,1,rtt)
+                            enew.addAttribute(ewid,"1",rtt)
+                            e_w_d[s1] = 1
+                templist.remove(w1)
+
+    output_file = open("eventhr.gexf","w")
+    gexf.write(output_file)
+
+def print_ve_gexf():
+    rawfile = "HKALL919to1019_tags_RT10count.csv"
+    nodedict = defaultdict(list)
+    edgedict = defaultdict(list)
+    edge_sourcetarget = defaultdict(list)
+
+    with open(rawfile, 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            tt = time.strptime(row[0], "%Y-%m-%d %H")
+            rtt = time.strftime("%Y-%m-%d %H:00:00", tt)
+            words = row[1].split('/')
+            templist = [] #to help build edge
+            for w in words:
+                templist.append(w)
+                nodedict[w].append(rtt)
+            for w1 in templist:
+                for w2 in templist:
+                    if w1 != w2:
+                        s1 = w1 + w2
+                        s2 = w2 + w1
+                        if s1 in edgedict.iterkeys():
+                            edgedict[s1].append(rtt)
+                        elif s2 in edgedict.iterkeys():
+                            edgedict[s2].append(rtt)
+                        else :
+                            edgedict[s1].append(rtt) #第一次出現的邊必須先確定好id
+                            edge_sourcetarget[s1].append(w1) #source
+                            edge_sourcetarget[s1].append(w2) #target
+                templist.remove(w1)
+
+    #gexf file
+    gf = open("true919to1019_eventhr.gexf", 'wb')
+    gf.write("<nodes>\n")
+    for key, value in nodedict.iteritems():
+        for first in value:
+            if first == value[0]:
+                gf.write("\t<node id=\"" + key + "\" label=\"" + key + "\" start=\"" + first + "\">\n")
+        gf.write("\t\t<attvalues>\n")
+        for v in value:
+            i = value.index(v) + 1
+            gf.write("\t\t\t<attvalue for=\"0\" value=\"" + str(i) + "\" start=\"" + v + "\"/>\n")
+        gf.write("\t\t</attvalues>\n")
+        gf.write("\t</node>\n")
+    gf.write("</nodes>\n")
+    gf.write("<edges>\n")
+    for key, value in edgedict.iteritems():
+        for first in value:
+            if first == value[0]:
+                gf.write("\t<edge id=\"" + key + "\" source=\"" + edge_sourcetarget[key][0] +
+                        "\" target=\"" + edge_sourcetarget[key][1] + "\" start=\"" + first + "\" weight=\"1\">\n")
+        gf.write("\t\t<attvalues>\n")
+        for v in value:
+            i = value.index(v) + 1
+            gf.write("\t\t\t<attvalue for=\"0\" value=\"" + str(i) + "\" start=\"" + v + "\"/>\n")
+        gf.write("\t\t</attvalues>\n")
+        gf.write("\t</edge>\n")
+    gf.write("</edges>\n")
+    gf.write("</graph>\n")
+    gf.write("</gexf>\n")
+    gf.close()
 
 if __name__ == "__main__":
     data = "rawdata/HKALL_tweets_RT10count.csv"
     bins = "HKALL_"
     #func_tags(data,bins)
     #func_syntac(data,bins)
-    keyword_change()
+    #keyword_change()
+    #makeGexf()
+    print_ve_gexf()
