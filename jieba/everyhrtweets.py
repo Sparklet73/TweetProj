@@ -9,18 +9,21 @@ from _gexf import Gexf
 import time
 import chardet
 import codecs
+import re
 
 jieba.set_dictionary('dict/dict.txt.big')
 jieba.load_userdict("dict/userdict.txt")
 jieba.analyse.set_stop_words("dict/utf8stopwords_addtrad.txt")
-stopwords = ["http","co","RT"]
+stopwords = ["http","co","RT","https","香港","雨傘革命","占中","佔中","雨傘","清場",
+             "佔領","中環","運動","HKStudentStrike","雨遮","革命","遮打","普選",
+             "hongkong","umbrellarevolution","occupycentral","occupyhk","hkclassboycott"]
 
 default_encoding = 'utf-8'
 if sys.getdefaultencoding() != default_encoding:
     reload(sys)
     sys.setdefaultencoding(default_encoding)
 
-def func_tags(data,bins):
+def func_tags_hr(data,bins):
     dateTXT = {}
     with open(data, 'r') as f:
         reader = csv.reader(f)
@@ -46,6 +49,35 @@ def func_tags(data,bins):
     fns.write(dstr.encode('utf8'))
     fns.close()
     f.close()
+
+def tags_week(bins):
+    weekTXT = {}
+    with open("rawdata/HKALL_week_RT10count.csv", 'r') as f:
+        reader = csv.reader(f)
+        week = ""
+        content = ""
+        for row in reader:
+            if(week != row[1]):
+                tags = jieba.analyse.extract_tags(content, 50)
+                for sw in stopwords:
+                    for n in tags:
+                        n = n.encode('utf8')
+                        m = re.search(sw,n,re.IGNORECASE)
+                        if bool(m) is True:
+                            tags.remove(n)
+                result = "/".join(tags)
+                weekTXT.update({week:result})
+                week = row[1]
+                content = ""
+            content += row[2]
+    dstr = ""
+    for k, v in weekTXT.iteritems():
+        dstr += k + "," + v + "\n"
+    fns = open(bins+"week_tags_ovrRT10.csv", 'wb')
+    fns.write(dstr.encode('utf8'))
+    fns.close()
+    f.close()
+
 
 def func_syntac(data,bins):
     fin = open(bins+"syntac_RT10count.csv", 'wb')
@@ -247,8 +279,9 @@ def print_ve_gexf():
 if __name__ == "__main__":
     data = "rawdata/HKALL_tweets_RT10count.csv"
     bins = "HKALL_"
-    #func_tags(data,bins)
+    #func_tags_hr(data,bins)
+    tags_week(bins)
     #func_syntac(data,bins)
     #keyword_change()
     #makeGexf()
-    print_ve_gexf()
+    #print_ve_gexf()
