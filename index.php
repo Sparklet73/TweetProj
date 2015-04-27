@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <title>Timeline</title>
+    <title>thesisproj</title>
     <meta charset="utf-8">
     <script src="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css"></script>
     <script src="jquery/jquery-2.1.3.min.js"></script>
@@ -9,52 +9,46 @@
         body, html {
             font-family: sans-serif;
         }
+        #cy {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
     </style>
-    <script src="http://visjs.org/dist/vis.js"></script>
-    <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+
 </head>
 <body>
-<div class="container">
-    <div class="row">
-        <div id="visualization"></div>
-
-        <script type="text/javascript">
-        // DOM element where the Timeline will be attached
-        var container = document.getElementById('visualization');
-        var showTimeline = function (user, content, startday) {
-            $.ajaxSetup({
-                cache: false
-            });
-
-            var jqxhr = $.getJSON('ajax_test.php'. {
-                usr: user,
-                ct: content,
-                st: startday
-            });
-
-            jqxhr.done(function (data) {
-                if(data.rsStatus) {
-                }
-            })
+<script src="sigma.js/build/sigma.min.js"></script>
+<script src="sigma.js/build/plugins/sigma.parsers.gexf.min.js"></script>
+<div id="container">
+    <style>
+        #graph-container {
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            position: absolute;
         }
-
-        // Create a DataSet (allows two way data-binding)
-        var items = new vis.DataSet([
-            {id: 1, content: 'item 1', start: '2014-04-20'},
-            {id: 2, content: 'item 2', start: '2014-04-14'},
-            {id: 3, content: 'item 3', start: '2014-04-18'},
-            {id: 4, content: 'item 4', start: '2014-04-16', end: '2014-04-19'},
-            {id: 5, content: 'item 5', start: '2014-04-25'},
-            {id: 6, content: 'item 6', start: '2014-04-27', type: 'point'}
-        ]);
-
-        // Configuration for the Timeline
-        var options = {};
-
-        // Create a Timeline
-        var timeline = new vis.Timeline(container, items, options);
-        </script>
-    </div>
+    </style>
+    <div id="graph-container"></div>
 </div>
+<script>
+    /**
+     * Here is just a basic example on how to properly display a graph
+     * exported from Gephi in the GEXF format.
+     *
+     * The plugin sigma.parsers.gexf can load and parse the GEXF graph file,
+     * and instantiate sigma when the graph is received.
+     *
+     * The object given as the second parameter is the base of the instance
+     * configuration object. The plugin will just add the "graph" key to it
+     * before the instanciation.
+     */
+    sigma.parsers.gexf('arctic.gexf', {
+        container: 'graph-container'
+    });
+</script>
 </body>
 </html>
