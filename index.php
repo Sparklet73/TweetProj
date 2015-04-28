@@ -3,27 +3,20 @@
 <head>
     <title>thesisproj</title>
     <meta charset="utf-8">
-    <script src="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css"></script>
+    <link href="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="jquery/jquery-2.1.3.min.js"></script>
+    <script src="vis/dist/vis.js"></script>
+    <link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
+    <script src="sigma.js/build/sigma.min.js"></script>
+    <script src="sigma.js/build/plugins/sigma.parsers.gexf.min.js"></script>
     <style type="text/css">
         body, html {
             font-family: sans-serif;
         }
-        #cy {
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            left: 0;
-            top: 0;
+        .col-md-8 {
+            width: 800px;
+            height: 600px;
         }
-    </style>
-
-</head>
-<body>
-<script src="sigma.js/build/sigma.min.js"></script>
-<script src="sigma.js/build/plugins/sigma.parsers.gexf.min.js"></script>
-<div id="container">
-    <style>
         #graph-container {
             top: 0;
             bottom: 0;
@@ -32,23 +25,56 @@
             position: absolute;
         }
     </style>
-    <div id="graph-container"></div>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8" id="nn">
+            <h4>Tweets Network</h4>
+            <div id="graph-container"></div>
+        </div>
+        <script type="text/javascript">
+            sigma.parsers.gexf('arctic.gexf', {
+                container: 'graph-container'
+            });
+        </script>
+        <div class="col-md-4">
+            <h4>Content 2</h4>
+        </div>
+    </div>
+    <div class="row" id="timeline">
+        <h4>Timeline</h4>
+        <div id="visualization"></div>
+        <script type="text/javascript">
+            var container = document.getElementById('visualization');
+            var showTimeline = function () {
+                $.ajaxSetup({
+                    cache: false
+                });
+
+                var jqxhr = $.getJSON('ajax_rt100tweets.php');
+
+                jqxhr.done(function (data) {
+                    if(data.rsStatus) {
+                        buildTweetsTimeline(data.rsAns);
+                    } else {
+                        showMessage('danger', data.rsAns);
+                    }
+                });
+            };
+
+            var buildTweetsTimeline = function(aryLists) {
+                var options = {
+                    height: '300px'
+                };
+                var items = new vis.DataSet(aryLists);
+                var timeline = new vis.Timeline(container, items, options);
+            };
+
+            showTimeline();
+
+        </script>
+    </div>
 </div>
-<script>
-    /**
-     * Here is just a basic example on how to properly display a graph
-     * exported from Gephi in the GEXF format.
-     *
-     * The plugin sigma.parsers.gexf can load and parse the GEXF graph file,
-     * and instantiate sigma when the graph is received.
-     *
-     * The object given as the second parameter is the base of the instance
-     * configuration object. The plugin will just add the "graph" key to it
-     * before the instanciation.
-     */
-    sigma.parsers.gexf('arctic.gexf', {
-        container: 'graph-container'
-    });
-</script>
 </body>
 </html>
