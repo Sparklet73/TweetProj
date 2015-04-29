@@ -12,7 +12,8 @@ import codecs
 import re
 
 jieba.set_dictionary('dict/dict.txt.big')
-jieba.load_userdict("dict/userdict.txt")
+#add my own dict by hashtag_zh
+jieba.load_userdict("dict/userdict_byhashtag_zh.txt")
 jieba.analyse.set_stop_words("dict/utf8stopwords_addtrad.txt")
 stopwords = ["http","co","RT","https","香港","雨傘革命","占中","佔中","雨傘","清場",
              "佔領","中環","運動","HKStudentStrike","雨遮","革命","遮打","普選",
@@ -23,6 +24,23 @@ if sys.getdefaultencoding() != default_encoding:
     reload(sys)
     sys.setdefaultencoding(default_encoding)
 
+#preprocess tweets tokenization
+#just cut tweets without remove stopwords
+def tweetsPreprocessing():
+    rawfile = "rawdata/HKALL_tweets_zh.csv"
+    output = open("HKALL_tweets_jieba_nonoun.csv", 'wb')
+
+    with open(rawfile, 'rb') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            seg_list = jieba.cut(row[20])
+            result = "/".join(seg_list)
+            str = row[0]+","+row[1]+","+result+"\n"
+            output.write(str.encode('utf8'))
+
+    f.close()
+    output.close()
+
 def func_tags_hr(data,bins):
     dateTXT = {}
     with open(data, 'r') as f:
@@ -31,7 +49,7 @@ def func_tags_hr(data,bins):
         content = ""
         for row in reader:
             if(date != row[0]):
-                tags = jieba.analyse.extract_tags(content, topK=20)
+                tags = jieba.analyse.extract_tags(content, 30)
                 for sw in stopwords:
                     if sw in tags:
                         tags.remove(sw)
@@ -45,7 +63,7 @@ def func_tags_hr(data,bins):
     for k, v in dateTXT.items():
         dstr += k + "," + v + "\n"
 
-    fns = open(bins+"tags_RT10count.csv", 'wb')
+    fns = open(bins+"tags_RT10cnt.csv", 'wb')
     fns.write(dstr.encode('utf8'))
     fns.close()
     f.close()
@@ -80,9 +98,9 @@ def tags_week(bins):
 
 
 def func_syntac(data,bins):
-    fin = open(bins+"syntac_RT10count.csv", 'wb')
-    lst=["nr","ns","nt","a","eng"]
-    fin.write("date,nr,ns,nt,a,eng")
+    fin = open(bins+"syntac_RT10cnt_n_series.csv", 'wb')
+    lst=["nr","ns","nt","nz","nl","ng"]
+    fin.write("date,nr,ns,nt,nz,nl,ng")
     dSyn = defaultdict(dict)
     for grammar in lst:
         dSyn[grammar]
@@ -91,6 +109,7 @@ def func_syntac(data,bins):
         reader = csv.reader(f)
         date = ""
         content = ""
+        #tweetscnt = 0
         for row in reader:
             if(date != row[0]):
                 words = pseg.cut(content)
@@ -99,7 +118,7 @@ def func_syntac(data,bins):
                         continue
                     if(w.flag in dSyn):
                         if(w.word not in dSyn[w.flag]):
-                            dSyn[w.flag][w.word] = 0
+                            dSyn[w.flag][w.word] = 1
                         else:
                             dSyn[w.flag].update({w.word:dSyn[w.flag][w.word]+1})
                 dstr = date + ","
@@ -108,18 +127,28 @@ def func_syntac(data,bins):
                     for kw in sorted_elem:
                         dstr += kw[0] + "/"
                     dstr += ","
+                #dstr += "\n" + date + ","
+                #for elem in lst:
+                #    sorted_elem = sorted(dSyn[elem].items(), key=operator.itemgetter(1), reverse=True)
+                #    for kw in sorted_elem:
+                #        per = "{0:0.0f}%".format(float(kw[1])/tweetscnt * 100)
+                #        dstr += per + "\t"
+                #    dstr += ","
                 dstr += "\n"
                 fin.write(dstr.encode('utf8'))
                 date = row[0]
                 content = ""
+                #tweetscnt = 0
                 dSyn = defaultdict(dict)
                 for grammar in lst:
                     dSyn[grammar]
+            #tweetscnt += 1
             content += row[1]
 
     f.close()
     fin.close()
 
+#to help look what word is emerging.
 def keyword_change():
     fres = open("HKALL_keywordChange.csv",'wb')
     fres.write("date,nr,ns,nt,a,eng")
@@ -215,7 +244,7 @@ def makeGexf():
     gexf.write(output_file)
 
 def print_ve_gexf():
-    rawfile = "HKALL919to1019_tags_RT10count.csv"
+    rawfile = "HKALL_927to1004syntac_RT10cnt_nr.csv"
     nodedict = defaultdict(list)
     edgedict = defaultdict(list)
     edge_sourcetarget = defaultdict(list)
@@ -225,6 +254,7 @@ def print_ve_gexf():
         for row in reader:
             tt = time.strptime(row[0], "%Y-%m-%d %H")
             rtt = time.strftime("%Y-%m-%d %H:00:00", tt)
+            #rtt = row[0]
             words = row[1].split('/')
             templist = [] #to help build edge
             for w in words:
@@ -246,7 +276,7 @@ def print_ve_gexf():
                 templist.remove(w1)
 
     #gexf file
-    gf = open("true919to1019_eventhr.gexf", 'wb')
+    gf = open("nr_927_1004.gexf", 'wb')
     gf.write("<nodes>\n")
     for key, value in nodedict.iteritems():
         for first in value:
@@ -280,8 +310,9 @@ if __name__ == "__main__":
     data = "rawdata/HKALL_tweets_RT10count.csv"
     bins = "HKALL_"
     #func_tags_hr(data,bins)
-    tags_week(bins)
-    #func_syntac(data,bins)
+    #tags_week(bins)
+    func_syntac(data,bins)
     #keyword_change()
     #makeGexf()
     #print_ve_gexf()
+    #tweetsPreprocessing()
