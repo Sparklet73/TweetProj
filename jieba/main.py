@@ -13,7 +13,7 @@ import re
 
 jieba.set_dictionary('dict/dict.txt.big')
 #add my own dict by hashtag_zh
-jieba.load_userdict("dict/userdict_byhashtag_zh.txt")
+#jieba.load_userdict("dict/userdict_byhashtag_zh.txt")
 jieba.analyse.set_stop_words("dict/utf8stopwords_addtrad.txt")
 stopwords = ["http","co","RT","https","香港","雨傘革命","占中","佔中","雨傘","清場",
              "佔領","中環","運動","HKStudentStrike","雨遮","革命","遮打","普選",
@@ -27,6 +27,7 @@ if sys.getdefaultencoding() != default_encoding:
 #preprocess tweets tokenization
 #just cut tweets without remove stopwords
 def tweetsPreprocessing():
+    jieba.load_userdict("dict/userdict_byhashtag.txt")
     rawfile = "rawdata/HKALL_tweets_zh.csv"
     output = open("HKALL_tweets_jieba_nonoun.csv", 'wb')
 
@@ -98,9 +99,10 @@ def tags_week(bins):
 
 
 def func_syntac(data,bins):
-    fin = open(bins+"syntac_RT10cnt_n_series.csv", 'wb')
-    lst=["nr","ns","nt","nz","nl","ng"]
-    fin.write("date,nr,ns,nt,nz,nl,ng")
+    jieba.load_userdict("dict/userdict.txt")
+    fin = open(bins+"syntac_RT10cnt_nrnt.csv", 'wb')
+    lst=["nr","nt"]
+    fin.write("date,nr,nt")
     dSyn = defaultdict(dict)
     for grammar in lst:
         dSyn[grammar]
@@ -116,7 +118,10 @@ def func_syntac(data,bins):
                 for w in words:
                     if w.word in stopwords:
                         continue
-                    if(w.flag in dSyn):
+                    uniword = w.word.decode('utf8')
+                    if len(uniword) == 1:
+                        continue
+                    if w.flag in dSyn:
                         if(w.word not in dSyn[w.flag]):
                             dSyn[w.flag][w.word] = 1
                         else:
