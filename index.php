@@ -14,8 +14,8 @@
             font-family: sans-serif;
         }
         .col-md-8 {
-            width: 800px;
-            height: 600px;
+            width: 700px;
+            height: 500px;
         }
         #graph-container {
             top: 0;
@@ -65,10 +65,13 @@
 
             var buildTweetsTimeline = function(aryLists) {
                 var options = {
-                    height: '300px'
+                    height: '400px',
+                    min: new Date(2014, 8, 25),               // lower limit of visible range
+                    max: new Date(2014, 12, 17)                // upper limit of visible range
                 };
                 var items = new vis.DataSet(aryLists);
                 var timeline = new vis.Timeline(container, items, options);
+                //timeline.setWindow('2014-09-20','2014-09-30');
             };
 
             showTimeline();

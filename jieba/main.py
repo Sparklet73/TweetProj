@@ -27,7 +27,7 @@ if sys.getdefaultencoding() != default_encoding:
 #preprocess tweets tokenization
 #just cut tweets without remove stopwords
 def tweetsPreprocessing():
-    jieba.load_userdict("dict/userdict_byhashtag.txt")
+    jieba.load_userdict("dict/userdict_byhashtag_zh.txt")
     rawfile = "rawdata/HKALL_tweets_zh.csv"
     output = open("HKALL_tweets_jieba_nonoun.csv", 'wb')
 
@@ -42,7 +42,9 @@ def tweetsPreprocessing():
     f.close()
     output.close()
 
+#the row[0] need to be date or datehr.
 def func_tags_hr(data,bins):
+    jieba.load_userdict("dict/userdict_byhashtag_zh_sharp.txt")
     dateTXT = {}
     with open(data, 'r') as f:
         reader = csv.reader(f)
@@ -64,7 +66,7 @@ def func_tags_hr(data,bins):
     for k, v in dateTXT.items():
         dstr += k + "," + v + "\n"
 
-    fns = open(bins+"tags_RT10cnt.csv", 'wb')
+    fns = open(bins+"tags_RT10cnt_date.csv", 'wb')
     fns.write(dstr.encode('utf8'))
     fns.close()
     f.close()
@@ -248,7 +250,7 @@ def makeGexf():
     output_file = open("eventhr.gexf","w")
     gexf.write(output_file)
 
-def print_ve_gexf():
+def print_gexf_dynamics():
     rawfile = "HKALL_927to1004syntac_RT10cnt_nr.csv"
     nodedict = defaultdict(list)
     edgedict = defaultdict(list)
@@ -312,12 +314,12 @@ def print_ve_gexf():
     gf.close()
 
 if __name__ == "__main__":
-    data = "rawdata/HKALL_tweets_RT10count.csv"
+    data = "rawdata/HKALL_date_RT10count.csv"
     bins = "HKALL_"
-    #func_tags_hr(data,bins)
+    func_tags_hr(data,bins)
     #tags_week(bins)
-    func_syntac(data,bins)
+    #func_syntac(data,bins)
     #keyword_change()
     #makeGexf()
-    #print_ve_gexf()
+    #print_gexf_dynamics()
     #tweetsPreprocessing()
