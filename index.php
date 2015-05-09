@@ -12,6 +12,7 @@
     <script src="sigma.js/build/plugins/sigma.parsers.json.min.js"></script>
     <script src="dateslider/jQDateRangeSlider-min.js"></script>
     <script src="dateslider/jquery.mousewheel.min.js"></script>
+    <link rel="stylesheet" href="css/iThing.css" type="text/css" />
 
     <style type="text/css">
         body, html {
@@ -34,13 +35,12 @@
 <body>
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
+
             <h2>Tweets Network</h2>
             <div id="keywordGraph"></div>
-        </div>
         <script type="text/javascript">
             var sigmacontainer = document.getElementById('keywordGraph');
-            var showKeywordGraph = function (date) {
+            var showKeywordGraph = function () {
                 $.ajaxSetup({
                    cache: false
                 });
@@ -57,7 +57,7 @@
             };
 
             var buildKeywordGraph = function(aryLists) {
-                sigma.parsers.json('arctic.gexf', {
+                sigma.parsers.json(aryLists, {
                     container: 'keywordGraph'
                 });
             };
@@ -65,12 +65,38 @@
             showKeywordGraph();
 
         </script>
-
-        <div class="col-md-4">
-            <h2>Time point</h2>
-            <!--<div id="dateSlider"></div>!-->
-        </div>
     </div>
+    <div class="row">
+        <div id="rangeSlider"></div><br>
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-5">
+                <button type="submit" name="update" class="btn btn-default">Update</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $("#rangeSlider").dateRangeSlider({
+                defaultValues:{
+                    min: new Date(2014, 8, 25),
+                    max: new Date(2014, 9, 5)
+                },
+                range:{
+                    min: {days: 1}
+                },
+                bounds: {
+                    min: new Date(2014, 7, 25),
+                    max: new Date(2014, 11, 16)
+                }});
+            $(":button").click(function () {
+                var dateValues = $("#rangeSlider").dateRangeSlider("values");
+                startmon = dateValues.min.getMonth()+1;
+                startday = dateValues.min.getFullYear() + "-" + startmon + "-" + dateValues.min.getDate() ;
+                endmon = dateValues.max.getMonth()+1;
+                endday = dateValues.max.getFullYear() + "-" + endmon + "-" + dateValues.max.getDate() ;
+                window.alert(startday + " to " + endday);
+            });
+        </script>
+    </div>
+
     <div class="row" id="timeline">
         <h3>Timeline</h3>
         <div id="visualization"></div>
