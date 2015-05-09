@@ -23,7 +23,7 @@ try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $dbuser, $dbpass);
     $dbh ->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT `text` as content, DATE_FORMAT(`created_at`,'%Y-%m-%d %H:%M:%S')start FROM `HKALL_tweets_zh`
+    $sql = "SELECT `text` as content, DATE_FORMAT(`created_at`,'%Y-%m-%d %H:%m:%s') as start FROM `HKALL_tweets_zh`
             where `retweet_count` > 99
             GROUP BY `retweet_id`";
 

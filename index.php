@@ -5,19 +5,23 @@
     <meta charset="utf-8">
     <link href="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="jquery/jquery-2.1.3.min.js"></script>
+    <script src="jquery/jquery-ui.min.js"></script>
     <script src="vis/dist/vis.js"></script>
     <link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
     <script src="sigma.js/build/sigma.min.js"></script>
-    <script src="sigma.js/build/plugins/sigma.parsers.gexf.min.js"></script>
+    <script src="sigma.js/build/plugins/sigma.parsers.json.min.js"></script>
+    <script src="dateslider/jQDateRangeSlider-min.js"></script>
+    <script src="dateslider/jquery.mousewheel.min.js"></script>
+
     <style type="text/css">
         body, html {
-            font-family: sans-serif;
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         }
         .col-md-8 {
             width: 700px;
             height: 500px;
         }
-        #graph-container {
+        #keywordGraph {
             top: 0;
             bottom: 0;
             left: 0;
@@ -26,24 +30,49 @@
         }
     </style>
 </head>
+
 <body>
 <div class="container">
     <div class="row">
-        <div class="col-md-8" id="nn">
-            <h4>Tweets Network</h4>
-            <div id="graph-container"></div>
+        <div class="col-md-8">
+            <h2>Tweets Network</h2>
+            <div id="keywordGraph"></div>
         </div>
         <script type="text/javascript">
-            sigma.parsers.gexf('arctic.gexf', {
-                container: 'graph-container'
-            });
+            var sigmacontainer = document.getElementById('keywordGraph');
+            var showKeywordGraph = function (date) {
+                $.ajaxSetup({
+                   cache: false
+                });
+
+                var jqxhr = $.getJSON('ajax_showkwgraph.php');
+
+                jqxhr.done(function (data) {
+                    if(data.rsStat) {
+                        buildKeywordGraph(data.rsGraph);
+                    } else {
+                        showMessage('danger', data.rsGraph);
+                    }
+                });
+            };
+
+            var buildKeywordGraph = function(aryLists) {
+                sigma.parsers.json('arctic.gexf', {
+                    container: 'keywordGraph'
+                });
+            };
+
+            showKeywordGraph();
+
         </script>
+
         <div class="col-md-4">
-            <h4>Content 2</h4>
+            <h2>Time point</h2>
+            <!--<div id="dateSlider"></div>!-->
         </div>
     </div>
     <div class="row" id="timeline">
-        <h4>Timeline</h4>
+        <h3>Timeline</h3>
         <div id="visualization"></div>
         <script type="text/javascript">
             var container = document.getElementById('visualization');
