@@ -7,39 +7,80 @@
  */
 require_once 'config.php';
 
-/*$strDate = filter_input(INPUT_GET, 'dt', FILTER_SANITIZE_STRING);
+$strStartDate = filter_input(INPUT_GET, 'sd', FILTER_SANITIZE_STRING);
+$strEndDate = filter_input(INPUT_GET, 'ed', FILTER_SANITIZE_STRING);
 
-if(!$strDate) {
+if( !$strStartDate || !$strEndDate ) {
     $arrResult['rsStat'] = false;
     $arrResult['rsGraph'] = "The parameter has problem.";
-*/
+}
 
 try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database;charset=utf8", $dbuser, $dbpass);
     $dbh ->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT `text`
-            FROM `HKALL_tags_RT10cnt_date`";
-            //WHERE `date`= " . $strDate . ";";
+
+    $sql = "SELECT *
+            FROM `HKALL_tags_RT10cnt_date`
+            WHERE `date` between '" . $strStartDate . "' and '" . $strEndDate ."';";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute();
 
     $arrResult['rsStat'] = true;
-    $id = 1;
-    while($arrQue = $stmt->fetchAll(PDO::FETCH_ASSOC)) {
-        $arrKeywords = explode("/",$arrQue['text']);
-        foreach($arrKeywords as $word)
-            $id += 1;
-            $arrNodes[$word] = $word;
+    //nodes:id,label,size(weight)
+    //edges:id,source,target
+    $arrNodeSize = array(); //arr[id]=weight
+    $arrNodeLabel = array(); //arr[id]=label
+    $arrNodeId = array(); //help build edge relation
+    $arrEdge = array(); //arr['source']['target']
+    $edge_id = 1;
+
+    while($arrQue = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $arrKeywords = explode("/", $arrQue['text']);
+        foreach($arrKeywords as $word) {
+            if($key = array_search($word,$arrNodeLabel)) {
+                $arrNodeSize[$key] += 1;
+            } else {
+                $c = count($arrNodeLabel);
+                $arrNodeLabel[$c] = $word;
+                $arrNodeSize[$c] = 1;
+                $arrNodeId[] = $c;
+            }
+        }
+
+        sort($arrNodeId);
+        $len_text = count($arrNodeId);
+
+        for($i=0; $i < $len_text; $i++){
+            for($j=$i+1; $j < $len_text; $j++){
+                array_push($arrEdge, array(
+                    "id" => $edge_id,
+                    "source" => $arrNodeId[$i],
+                    "target" => $arrNodeId[$j]));
+                $edge_id++;
+            }
+        }
+        unset($arrNodeId);
     }
-    $arrEdges;
-    $arrNodes;
+
+    foreach($arrNodeLabel as $key => $value){
+        array_push($arrTweets['nodes'], array(
+            "id" => $key,
+            "label" => $value,
+            "size" => $arrNodeSize[$key],
+            "x" => rand(-40,40),
+            "y" => rand(-20,20),
+            "color" => "#333"));
+    }
+
+    $arrTweets['edges'] = $arrEdge;
+
     $arrResult['rsGraph'] = $arrTweets;
 
 } catch(PDOException $ex) {
     $arrResult['rsStatus'] = false;
-    $arrResult['rsAns'] = $ex->getMessage();
+    $arrResult['rsGraph'] = $ex->getMessage();
 } catch(Exception $exc){
     echo $exc->getMessage();
 }
