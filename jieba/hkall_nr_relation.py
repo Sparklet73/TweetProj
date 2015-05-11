@@ -18,6 +18,11 @@ def rt10text():
     jieba.load_userdict('dict/userdict.txt')
     rawfile = "rawdata/HKALL_rt10_rawtweets.csv"
     output = open("HKALL_rt10tklist.csv", 'wb')
+    gdf = open("rt10tklist.gdf",'wb')
+    gstr = "nodedef>name VARCHAR,label VARCHAR,no_times INT\n"
+    nodeid = 1
+    nodelst = defaultdict(int)
+    edgelst = []
 
     d_n_times = defaultdict(int)
     d_relation = defaultdict(dict)
@@ -32,7 +37,7 @@ def rt10text():
                 if w.flag == "nr" or w.flag == "nt":
                     #ww = w.word
                     #tmpstr = ww.decode('utf8')
-                    if len(w.word) > 1:
+                    if len(w.word) > 1: #一個字的不要算
                         templist.append(w.word)
             for k in templist:
                 d_n_times[k] += 1
@@ -45,14 +50,28 @@ def rt10text():
         sorted_elem = sorted(d_n_times.items(),key=operator.itemgetter(1),reverse=True)
         for kw in sorted_elem:
             pstr += kw[0] + "," + str(kw[1]) + ","
+            gstr += str(nodeid) + "," + kw[0] + "," + str(kw[1]) +"\n"
+            nodelst[kw[0]] = nodeid
+            nodeid +=1
             relation_sorted = sorted(d_relation[kw[0]].items(), key=operator.itemgetter(1),reverse=True)
             for kwkw in relation_sorted:
                 pstr += kwkw[0] + "," + str(kwkw[1]) + ","
+                if kwkw[0] not in nodelst:
+                    nodelst[kwkw[0]] = nodeid
+                    nodeid += 1
+                edgelst.append([nodelst[kw[0]],nodelst[kwkw[0]],kwkw[1]])
             pstr += "\n"
+
+        gstr += "edgedef>node1 VARCHAR,node2 VARCHAR,weight DOUBLE\n"
+        for e in edgelst:
+            gstr += str(e[0]) +","+ str(e[1])+","+str(e[2])+"\n"
+
         output.write(pstr.encode('utf8'))
+        gdf.write(gstr.encode('utf8'))
 
     f.close()
     output.close()
+    gdf.close()
 
 if __name__ == "__main__":
     rt10text()

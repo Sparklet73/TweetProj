@@ -7,7 +7,7 @@
     <script src="jquery/jquery-2.1.3.min.js"></script>
     <script src="jquery/jquery-ui.min.js"></script>
     <!--<script src="tweets.js"></script>-->
-    <!--<script src="mentionLayout.js"></script>-->
+    <script src="mentionLayout.js"></script>
     <script src="rangeSlider.js"></script>
     <script src="vis/dist/vis.js"></script>
     <link href="vis/dist/vis.css" rel="stylesheet" type="text/css" />
