@@ -34,6 +34,8 @@ try {
     $arrNodeLabel = array(); //arr[id]=label
     $arrNodeId = array(); //help build edge relation
     $arrEdge = array(); //arr['source']['target']
+    $arrTweets = array();
+    $arrTweets['nodes'] = array();
     $edge_id = 1;
 
     while($arrQue = $stmt->fetch(PDO::FETCH_ASSOC)) {
