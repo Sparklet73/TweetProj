@@ -25,7 +25,7 @@ try {
 
     $sql = "SELECT `text` as content, DATE_FORMAT(`created_at`,'%Y-%m-%d %H:%m:%s') as start FROM `HKALL_tweets_zh`
             where `retweet_count` > 99
-            GROUP BY `retweet_id`";
+            GROUP BY `text`";
 
     $stmt = $dbh->prepare($sql);
     $stmt->execute();
