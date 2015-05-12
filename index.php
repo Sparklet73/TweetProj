@@ -3,9 +3,11 @@
 <head>
     <title>thesisproj</title>
     <meta charset="utf-8">
-    <link href="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="jquery/jquery-2.1.3.min.js"></script>
     <script src="jquery/jquery-ui.min.js"></script>
+    <link href="bootstrap-3.3.1-dist/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="bootstrap-3.3.1-dist/vertical-tabs/bootstrap.vertical-tabs.min.css">
+    <script src="bootstrap-3.3.1-dist/dist/js/bootstrap.min.js"></script>
     <!--<script src="tweets.js"></script>-->
     <script src="mentionLayout.js"></script>
     <script src="rangeSlider.js"></script>
@@ -37,14 +39,29 @@
 <body>
 <div class="container">
     <div class="row">
-        <h2>Tweets Network</h2>
-        <div class="col-md-11">
-            <div id="mentionGraph"></div>
+        <div class="col-xs-3">
+            <ul class="nav nav-tabs tabs-left">
+                <li class="active"><a href="#home" data-toggle="tab">人物關係圖</a></li>
+                <li><a href="#profile" data-toggle="tab">Profile</a></li>
+                <li><a href="#messages" data-toggle="tab">Messages</a></li>
+                <li><a href="#settings" data-toggle="tab">Settings</a></li>
+            </ul>
         </div>
-        <div class="col-md-1">
-            <button type="button" name="animate" id="toggle-layout" class="btn btn-default">Start Layout</button>
+        <div class="col-xs-9">
+            <div class="tab-content">
+                <div class="tab-pane active" id="home">
+                    <div class="col-md-11">
+                        <div id="mentionGraph"></div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" name="animate" id="toggle-layout" class="btn btn-default">Start Layout</button>
+                    </div>
+                </div>
+                <div class="tab-pane" id="profile">Profile Tab.</div>
+                <div class="tab-pane" id="messages">Messages Tab.</div>
+                <div class="tab-pane" id="settings">Settings Tab.</div>
+            </div>
         </div>
-
     </div>
     <div class="row">
         <div id="rangeSlider"></div><br>
