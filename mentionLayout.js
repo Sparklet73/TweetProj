@@ -28,14 +28,45 @@ $(document).ready(function () {
                     labelThreshold: 1
                 });
                 s2.refresh();
+
+                // Initialize the Filter API
+                filter = new sigma.plugins.filter(s2);
+
+                updatePane(s2.graph, filter);
+
+                function applyMinDegreeFilter(e) {
+                    var v = e.target.value;
+                    _.$('min-degree-val').textContent = v;
+
+                    filter
+                            .undo('min-degree')
+                            .nodesBy(function (n) {
+                                return this.degree(n.id) >= v;
+                            }, 'min-degree')
+                            .apply();
+                }
+
+                function applyCategoryFilter(e) {
+                    var c = e.target[e.target.selectedIndex].value;
+                    filter
+                            .undo('node-category')
+                            .nodesBy(function (n) {
+                                return !c.length || n.attributes.acategory === c;
+                            }, 'node-category')
+                            .apply();
+                }
+
+                _.$('min-degree').addEventListener("input", applyMinDegreeFilter);  // for Chrome and FF
+                _.$('min-degree').addEventListener("change", applyMinDegreeFilter); // for IE10+, that sucks
+                _.$('node-category').addEventListener("change", applyCategoryFilter);
             }
     );
-/*
-    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-        s.settings({
-           autoRescale: true 
-        });
-        s.refresh();
-    });
-*/
+    /*
+     $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+     s.settings({
+     autoRescale: true 
+     });
+     s.refresh();
+     });
+     */
 });
