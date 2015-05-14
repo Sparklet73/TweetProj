@@ -28,7 +28,11 @@ $(document).ready(function () {
                     labelThreshold: 1
                 });
                 s2.refresh();
-
+                s2.bind('clickNode', function (event) {
+                    var lb = event.data.node.label;
+                    var web = "http://twitter.com/" + lb;
+                    window.open(web, lb, config='height=500,width=600');
+                });
                 // Initialize the Filter API
                 filter = new sigma.plugins.filter(s2);
 

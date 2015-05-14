@@ -29,12 +29,16 @@
             body, html {
                 font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
             }
+            .container-fluid {
+                margin: 0 auto;
+                width: 98%;
+            }
             #relationGraph {
                 top: 0;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                width: 1000px;
+                width: 800px;
                 height: 600px;
             }
             #mentionGraph {
@@ -42,7 +46,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                width: 1000px;
+                width: 800px;
                 height: 600px;
             }
             #control-pane {
@@ -93,9 +97,9 @@
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-xs-2">
+                <div class="col-md-2">
                     <ul class="nav nav-tabs tabs-left">
                         <li class="active"><a href="#peoplerelation" data-toggle="tab">人物關係圖</a></li>
                         <li><a href="#mention" data-toggle="tab">Mention graph</a></li>
@@ -103,21 +107,21 @@
                         <li><a href="#settings" data-toggle="tab">Settings</a></li>
                     </ul>
                 </div>
-                <div class="col-xs-10">
+                <div class="col-md-10">
                     <div class="tab-content">
                         <div class="tab-pane active" id="peoplerelation">
-                            <h3>人物關係圖</h3>
-                            <div class="col-md-11">
+                            <div class="row">
+                                <button type="button" name="restart-camera" id="restart-camera" class="btn btn-default">Reset Camera</button>
+                                <button type="button" name="reset-graph" id="reset-graph" class="btn btn-default">Reset Graph</button>
+                            </div>
+                            <div class="col-md-10">
                                 <div id="relationGraph"></div>
                             </div>
-                            <div class="col-md-1">
-                                <button type="button" name="restart-camera" id="restart-camera" class="btn btn-default">Reset Camera</button><br>
-                                <button type="button" name="reset-graph" id="reset-graph" class="btn btn-default">Reset Graph</button><br>
-                                <!--                                <button type="button" name="toggle-layout" id="toggle-layout" class="btn btn-default">Start Layout</button>-->
+                            <div class="col-md-2">
+                                <!--<button type="button" name="toggle-layout" id="toggle-layout" class="btn btn-default">Start Layout</button>-->
                             </div>
                         </div>
                         <div class="tab-pane" id="mention">
-                            <h3>Social mention graph</h3>
                             <div class="col-md-10">
                                 <div id="mentionGraph"></div>
                             </div>
@@ -148,6 +152,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="container">
             <div class="row">
                 <div id="rangeSlider"></div><br>
                 <div class="col-md-1">
@@ -155,9 +161,10 @@
                 </div>
                 <div class="col-md-11"></div>
             </div>
-
+        </div>
+        <div class="container-fluid">
             <div class="row">
-                <h3>Timeline</h3>
+                <h3>Tweets Timeline</h3>
                 <div id="visualization"></div>
                 <script type="text/javascript">
                     var container = document.getElementById('visualization');
@@ -181,7 +188,7 @@
                         var options = {
                             height: '500px',
                             min: new Date(2014, 8, 25), // lower limit of visible range
-                            max: new Date(2014, 12, 17)                // upper limit of visible range
+                            max: new Date(2014, 12, 17) // upper limit of visible range
                         };
                         var items = new vis.DataSet(aryLists);
                         var timeline = new vis.Timeline(container, items, options);

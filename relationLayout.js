@@ -24,7 +24,8 @@ $(document).ready(function () {
                     font: "微軟正黑體",
                     labelHoverBGColor: 'node',
                     defaultLabelHoverColor: '#000',
-                    labelHoverShadow: 'node'
+                    labelHoverShadow: 'node',
+                    labelThreshold: 3
                 });
                 s.refresh();
                 /*
@@ -107,7 +108,7 @@ $(document).ready(function () {
                         labelHoverBGColor: 'node',
                         defaultLabelHoverColor: '#000',
                         labelHoverShadow: 'node',
-                        labelThreshold: 5
+                        labelThreshold: 3
                     });
                     s.camera.goTo({
                         x: 0,
