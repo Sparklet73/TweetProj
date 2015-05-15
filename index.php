@@ -19,6 +19,7 @@
         <script src="sigma_js/build/plugins/sigma.plugins.neighborhoods.min.js"></script>
         <script src="sigma_js/build/plugins/sigma.plugins.filter.min.js"></script>
         <script src="dateslider/jQDateRangeSlider-min.js"></script>
+        <!--<script src="verticalTweetsLine.js"></script>-->
         <script src="relationLayout.js"></script>
         <script src="mentionLayout.js"></script>
         <script src="rangeSlider.js"></script>
@@ -38,7 +39,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                width: 800px;
+                width: 600px;
                 height: 600px;
             }
             #mentionGraph {
@@ -114,11 +115,76 @@
                                 <button type="button" name="restart-camera" id="restart-camera" class="btn btn-default">Reset Camera</button>
                                 <button type="button" name="reset-graph" id="reset-graph" class="btn btn-default">Reset Graph</button>
                             </div>
-                            <div class="col-md-10">
+                            <div class="col-md-8">
                                 <div id="relationGraph"></div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-4">
                                 <!--<button type="button" name="toggle-layout" id="toggle-layout" class="btn btn-default">Start Layout</button>-->
+                                <div id="verticalTweetsLine"></div>
+                                <style>
+                                    .drawing {
+                                        padding: 0px;
+                                        margin: 0px;
+                                    }
+                                    #verticalTweetsLine {
+                                        margin: 0;
+                                        position: relative;
+                                    }
+                                    .tlMajor {
+                                        left: 80px;
+                                        position: absolute;
+                                        width: 10px;
+                                        height: 10px;
+                                        background-color: #888;
+                                        border: 2px solid #eee;
+                                    }
+                                    .tlDateLabel {
+                                        position: absolute;
+                                        font-size: 12px;
+                                        color: #888;
+                                        text-align: right;
+                                        font-style: italic;
+                                        left: 0px;
+                                        width: 70px;
+                                    }
+                                    .tlLine {
+                                        position: absolute;
+                                        width: 2px;
+                                        background-color: #888;
+                                        top: 0px;
+                                        left: 85px;
+                                        border: 1px solid #aaa;
+                                    }
+                                    .tlDateDot {
+                                        left: 95px;
+                                        position: absolute;
+                                        width: 0;
+                                        height: 0;
+                                        border-top: 11px solid transparent;
+                                        border-bottom: 11px solid transparent;
+                                        border-right: 11px solid #5cac73;
+                                    }
+                                    .tlEventFlag {
+                                        left: 106px;
+                                        position: absolute;
+                                        width: 100px;
+                                        height: 14px;
+                                        background-color: #5cac73;
+                                        font-size: 12px;
+                                        padding: 4px 0px 4px 5px;
+                                        color: #fff;
+                                        cursor: pointer;
+                                    }
+                                    .tlEventExpand {
+                                        left: 230px;
+                                        position: absolute;
+                                        width: 200px;
+                                        background-color: #5cac73;
+                                        font-size: 12px;
+                                        padding: 0 10px 0 10px;
+                                        color: #fff;
+                                    }
+                                </style>
                             </div>
                         </div>
                         <div class="tab-pane" id="mention">

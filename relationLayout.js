@@ -84,6 +84,7 @@ $(document).ready(function () {
         s.bind('clickNode', function (event) {
             var nodeId = event.data.node.id;
             refreshGraph(nodeId);
+            var nodeLabel = event.data.node.label;
         });
 
     });
