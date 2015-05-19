@@ -8,8 +8,8 @@ $(document).ready(function () {
             max: new Date(2014, 9, 5)
         },
         range:{
-            min: {days: 7},
-            max: {days: 7}
+            min: {days: 7}
+            //max: {days: 7}
         },
         step:{
           days: 7

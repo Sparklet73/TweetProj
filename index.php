@@ -14,7 +14,7 @@
         <script src="sigma_js/build/sigma.min.js"></script>
         <script src="sigma_js/build/plugins/sigma.parsers.json.min.js"></script>
         <script src="sigma_js/build/plugins/sigma.layout.forceAtlas2.min.js"></script>
-        <script src="sigma_js/build/plugins/sigma.layout.fruchtermanReingold.js"></script>
+        <!--<script src="sigma_js/build/plugins/sigma.layout.fruchtermanReingold.js"></script>-->
         <script src="sigma_js/build/plugins/sigma.plugins.animate.min.js"></script>
         <script src="sigma_js/build/plugins/sigma.plugins.neighborhoods.min.js"></script>
         <script src="sigma_js/build/plugins/sigma.plugins.filter.min.js"></script>
@@ -39,7 +39,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                width: 600px;
+                width: 800px;
                 height: 600px;
             }
             #mentionGraph {
